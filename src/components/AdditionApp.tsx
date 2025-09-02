@@ -166,6 +166,16 @@ const AdditionApp = () => {
     }, 100);
   };
 
+  // Get answer box count based on mathematical principles
+  const getAnswerBoxCount = (digits: number) => {
+    switch(digits) {
+      case 1: return 2; // 1 digit + tens place
+      case 2: return 4; // 2 digits + hundreds + thousands  
+      case 3: return 5; // 3 digits + thousands + ten-thousands
+      default: return digits + 1;
+    }
+  };
+
   // Handle input change
   const handleInputChange = (problemIndex: number, digitIndex: number, value: string) => {
     if (!startedAt) {
@@ -181,7 +191,8 @@ const AdditionApp = () => {
       setAnswers(newAnswers);
 
       // Auto-advance to next input
-      if (value !== '' && digitIndex < problems[problemIndex].resultDigits.length - 1) {
+      const answerBoxCount = getAnswerBoxCount(digits);
+      if (value !== '' && digitIndex < answerBoxCount - 1) {
         const nextInput = inputRefs.current[problemIndex]?.[digitIndex + 1];
         if (nextInput) {
           nextInput.focus();
@@ -212,7 +223,8 @@ const AdditionApp = () => {
     } else if (e.key === 'Enter') {
       // Check if this is the last input of the last problem
       const isLastProblem = problemIndex === problems.length - 1;
-      const isLastDigit = digitIndex === problems[problemIndex].resultDigits.length - 1;
+      const answerBoxCount = getAnswerBoxCount(digits);
+      const isLastDigit = digitIndex === answerBoxCount - 1;
       
       if (isLastProblem && isLastDigit) {
         checkAnswers();
@@ -224,16 +236,17 @@ const AdditionApp = () => {
   const handlePaste = (problemIndex: number, digitIndex: number, e: React.ClipboardEvent) => {
     e.preventDefault();
     const pastedText = e.clipboardData.getData('text');
-    const digits = pastedText.replace(/\D/g, '').split('');
+    const digitsArray = pastedText.replace(/\D/g, '').split('');
     
     const newAnswers = [...answers];
     if (!newAnswers[problemIndex]) {
       newAnswers[problemIndex] = [];
     }
 
-    digits.forEach((digit, index) => {
+    digitsArray.forEach((digit, index) => {
       const targetIndex = digitIndex + index;
-      if (targetIndex < problems[problemIndex].resultDigits.length) {
+      const answerBoxCount = getAnswerBoxCount(digits);
+      if (targetIndex < answerBoxCount) {
         newAnswers[problemIndex][targetIndex] = digit;
       }
     });
@@ -249,15 +262,14 @@ const AdditionApp = () => {
     const newResults = problems.map((problem, problemIndex) => {
       const userAnswer = answers[problemIndex] || [];
       const correctDigits = problem.resultDigits;
+      const answerBoxCount = getAnswerBoxCount(digits);
       
-      // Check if all digits are correct
-      if (userAnswer.length === correctDigits.length) {
-        const isCorrect = correctDigits.every((digit, index) => 
-          parseInt(userAnswer[index]) === digit
-        );
-        return isCorrect ? 'correct' : 'incorrect';
-      }
-      return 'incorrect';
+      // Convert user answer to number, handling leading zeros
+      const userAnswerStr = userAnswer.join('').replace(/^0+/, '') || '0';
+      const userAnswerNum = parseInt(userAnswerStr);
+      
+      // Check if the answer matches the correct result
+      return userAnswerNum === problem.result ? 'correct' : 'incorrect';
     });
 
     setResults(newResults);
@@ -287,7 +299,16 @@ const AdditionApp = () => {
 
   // Show all answers
   const showAllAnswers = () => {
-    const correctAnswers = problems.map(problem => problem.resultDigits.map(d => d.toString()));
+    const answerBoxCount = getAnswerBoxCount(digits);
+    const correctAnswers = problems.map(problem => {
+      const result = problem.result.toString();
+      const answerArray = new Array(answerBoxCount).fill('');
+      // Fill from right to left
+      for (let i = 0; i < result.length; i++) {
+        answerArray[answerBoxCount - 1 - i] = result[result.length - 1 - i];
+      }
+      return answerArray;
+    });
     setAnswers(correctAnswers);
     setShowAnswers(true);
   };
@@ -640,7 +661,7 @@ const AdditionApp = () => {
                 {[10, 15, 20, 30].map((num) => (
                   <button
                     key={num}
-                    onClick={() => setCount(num)}
+                    onClick={() => { setCount(num); setTimeout(generateNewSet, 50); }}
                     className={`w-full px-3 py-2 rounded-lg font-medium transition-all ${
                       count === num
                         ? 'bg-blue-200 text-blue-800 shadow-sm'
@@ -660,7 +681,7 @@ const AdditionApp = () => {
               </label>
               <div className="space-y-2">
                 <button
-                  onClick={() => setLevel('easy')}
+                  onClick={() => { setLevel('easy'); setTimeout(generateNewSet, 50); }}
                   className={`w-full px-3 py-2 rounded-lg font-medium transition-all ${
                     level === 'easy'
                       ? 'bg-purple-200 text-purple-800 shadow-sm'
@@ -670,7 +691,7 @@ const AdditionApp = () => {
                   ง่าย
                 </button>
                 <button
-                  onClick={() => setLevel('medium')}
+                  onClick={() => { setLevel('medium'); setTimeout(generateNewSet, 50); }}
                   className={`w-full px-3 py-2 rounded-lg font-medium transition-all ${
                     level === 'medium'
                       ? 'bg-purple-200 text-purple-800 shadow-sm'
@@ -680,7 +701,7 @@ const AdditionApp = () => {
                   ปานกลาง
                 </button>
                 <button
-                  onClick={() => setLevel('hard')}
+                  onClick={() => { setLevel('hard'); setTimeout(generateNewSet, 50); }}
                   className={`w-full px-3 py-2 rounded-lg font-medium transition-all ${
                     level === 'hard'
                       ? 'bg-purple-200 text-purple-800 shadow-sm'
@@ -701,7 +722,7 @@ const AdditionApp = () => {
                 {[1, 2, 3].map((num) => (
                   <button
                     key={num}
-                    onClick={() => setDigits(num)}
+                    onClick={() => { setDigits(num); setTimeout(generateNewSet, 50); }}
                     className={`w-full px-3 py-2 rounded-lg font-medium transition-all ${
                       digits === num
                         ? 'bg-blue-200 text-blue-800 shadow-sm'
@@ -721,7 +742,7 @@ const AdditionApp = () => {
               </label>
               <div className="space-y-2">
                 <button
-                  onClick={() => setNumberSet(2)}
+                  onClick={() => { setNumberSet(2); setTimeout(generateNewSet, 50); }}
                   className={`w-full px-3 py-2 rounded-lg font-medium transition-all ${
                     numberSet === 2
                       ? 'bg-green-200 text-green-800 shadow-sm'
@@ -731,7 +752,7 @@ const AdditionApp = () => {
                   2 จำนวน
                 </button>
                 <button
-                  onClick={() => setNumberSet(3)}
+                  onClick={() => { setNumberSet(3); setTimeout(generateNewSet, 50); }}
                   className={`w-full px-3 py-2 rounded-lg font-medium transition-all ${
                     numberSet === 3
                       ? 'bg-green-200 text-green-800 shadow-sm'
@@ -750,7 +771,7 @@ const AdditionApp = () => {
               </label>
               <div className="space-y-2">
                 <button
-                  onClick={() => setCarry('none')}
+                  onClick={() => { setCarry('none'); setTimeout(generateNewSet, 50); }}
                   className={`w-full px-3 py-2 rounded-lg font-medium transition-all ${
                     carry === 'none'
                       ? 'bg-red-200 text-red-800 shadow-sm'
@@ -760,7 +781,7 @@ const AdditionApp = () => {
                   ไม่มี
                 </button>
                 <button
-                  onClick={() => setCarry('with')}
+                  onClick={() => { setCarry('with'); setTimeout(generateNewSet, 50); }}
                   className={`w-full px-3 py-2 rounded-lg font-medium transition-all ${
                     carry === 'with'
                       ? 'bg-red-200 text-red-800 shadow-sm'
@@ -808,10 +829,14 @@ const AdditionApp = () => {
               const addend2Str = problem.addend2.toString();
               const addend3Str = problem.addend3 ? problem.addend3.toString() : '';
               
-              // Calculate the maximum width needed
-              const maxLength = numberSet === 2 
-                ? Math.max(addend1Str.length, addend2Str.length + 1, problem.resultDigits.length)
-                : Math.max(addend1Str.length, addend2Str.length + 1, addend3Str.length + 1, problem.resultDigits.length);
+              // Calculate the maximum width needed - based on mathematical principles
+              const answerBoxCount = getAnswerBoxCount(digits);
+              const maxLength = Math.max(
+                addend1Str.length, 
+                addend2Str.length + 1,
+                numberSet === 3 ? addend3Str.length + 1 : 0,
+                answerBoxCount
+              );
 
               return (
                 <div
@@ -927,9 +952,9 @@ const AdditionApp = () => {
                       <div className="flex justify-center items-center">
                         {Array.from({ length: maxLength }, (_, i) => {
                           const digitPos = maxLength - 1 - i;
-                          const resultDigitIndex = problem.resultDigits.length - 1 - digitPos;
+                          const answerBoxIndex = answerBoxCount - 1 - digitPos;
                           
-                          if (resultDigitIndex >= 0) {
+                          if (answerBoxIndex >= 0 && answerBoxIndex < answerBoxCount) {
                             return (
                               <input
                                 key={i}
@@ -944,15 +969,15 @@ const AdditionApp = () => {
                                     ? 'bg-red-100 border-red-300'
                                     : 'border-gray-300'
                                 }`}
-                                value={(answers[problemIndex] as string[])?.[resultDigitIndex as number] || ''}
-                                onChange={(e) => handleInputChange(Number(problemIndex), Number(resultDigitIndex), e.target.value)}
-                                 onKeyDown={(e) => handleKeyDown(Number(problemIndex), Number(resultDigitIndex), e)}
-                                 onPaste={(e) => handlePaste(Number(problemIndex), Number(resultDigitIndex), e)}
+                                value={(answers[problemIndex] as string[])?.[answerBoxIndex as number] || ''}
+                                onChange={(e) => handleInputChange(Number(problemIndex), Number(answerBoxIndex), e.target.value)}
+                                 onKeyDown={(e) => handleKeyDown(Number(problemIndex), Number(answerBoxIndex), e)}
+                                 onPaste={(e) => handlePaste(Number(problemIndex), Number(answerBoxIndex), e)}
                                 ref={(el) => {
                                   if (!inputRefs.current[problemIndex]) {
                                     inputRefs.current[problemIndex] = [];
                                   }
-                                  inputRefs.current[problemIndex][resultDigitIndex] = el;
+                                  inputRefs.current[problemIndex][answerBoxIndex] = el;
                                 }}
                               />
                             );
