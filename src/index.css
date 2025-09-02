@@ -1,0 +1,203 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Pastel Math Learning App Design System for Children */
+
+@layer base {
+  :root {
+    /* Pastel Background Gradient */
+    --background: 220 100% 98%;
+    --foreground: 230 15% 15%;
+
+    /* Pastel Card Colors */
+    --card-primary: 210 100% 95%;
+    --card-secondary: 330 100% 95%;
+    --card-accent: 120 100% 95%;
+    --card-warning: 45 100% 95%;
+    
+    /* Colorful Problem Cards */
+    --card-yellow: 48 100% 92%;
+    --card-blue: 210 100% 92%;
+    --card-pink: 330 100% 92%;
+    --card-green: 120 60% 92%;
+    --card-purple: 280 100% 92%;
+    --card-orange: 30 100% 92%;
+    --card-cyan: 180 100% 92%;
+    --card-lime: 80 100% 92%;
+    
+    /* Problem Card Colors */
+    --problem-bg: 0 0% 100%;
+    --problem-border: 220 20% 90%;
+    --problem-shadow: 220 10% 85%;
+
+    /* Input Colors */
+    --input-bg: 0 0% 100%;
+    --input-border: 220 15% 85%;
+    --input-focus: 210 100% 85%;
+    --input-correct: 120 60% 85%;
+    --input-incorrect: 0 70% 85%;
+
+    /* Button Colors */
+    --btn-primary: 210 100% 92%;
+    --btn-primary-hover: 210 100% 88%;
+    --btn-primary-text: 210 100% 25%;
+    
+    --btn-secondary: 330 80% 92%;
+    --btn-secondary-hover: 330 80% 88%;
+    --btn-secondary-text: 330 80% 25%;
+    
+    --btn-success: 120 60% 92%;
+    --btn-success-hover: 120 60% 88%;
+    --btn-success-text: 120 60% 25%;
+    
+    --btn-danger: 0 70% 92%;
+    --btn-danger-hover: 0 70% 88%;
+    --btn-danger-text: 0 70% 25%;
+
+    /* Text Colors */
+    --text-primary: 230 15% 15%;
+    --text-secondary: 230 10% 45%;
+    --text-math: 230 80% 25%;
+    --text-answer: 210 100% 35%;
+
+    /* Gradients */
+    --gradient-bg: linear-gradient(135deg, hsl(210 100% 98%), hsl(330 100% 98%), hsl(45 100% 98%));
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(220 30% 98%));
+    
+    /* Shadows */
+    --shadow-soft: 0 4px 20px -2px hsl(220 10% 85% / 0.3);
+    --shadow-card: 0 8px 32px -4px hsl(220 15% 80% / 0.2);
+    --shadow-button: 0 2px 8px -1px hsl(220 15% 75% / 0.25);
+
+    /* Animation */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    --radius: 1rem;
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    background: var(--gradient-bg);
+    color: hsl(var(--text-primary));
+    font-family: 'Kanit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+}
+
+@layer components {
+  /* Pastel Button Variants */
+  .btn-pastel-primary {
+    @apply bg-[hsl(var(--btn-primary))] hover:bg-[hsl(var(--btn-primary-hover))] text-[hsl(var(--btn-primary-text))] font-medium px-4 py-2 rounded-xl shadow-[var(--shadow-button)] transition-[var(--transition-smooth)] border border-[hsl(var(--btn-primary-hover))];
+  }
+  
+  .btn-pastel-secondary {
+    @apply bg-[hsl(var(--btn-secondary))] hover:bg-[hsl(var(--btn-secondary-hover))] text-[hsl(var(--btn-secondary-text))] font-medium px-4 py-2 rounded-xl shadow-[var(--shadow-button)] transition-[var(--transition-smooth)] border border-[hsl(var(--btn-secondary-hover))];
+  }
+  
+  .btn-pastel-success {
+    @apply bg-[hsl(var(--btn-success))] hover:bg-[hsl(var(--btn-success-hover))] text-[hsl(var(--btn-success-text))] font-medium px-4 py-2 rounded-xl shadow-[var(--shadow-button)] transition-[var(--transition-smooth)] border border-[hsl(var(--btn-success-hover))];
+  }
+  
+  .btn-pastel-danger {
+    @apply bg-[hsl(var(--btn-danger))] hover:bg-[hsl(var(--btn-danger-hover))] text-[hsl(var(--btn-danger-text))] font-medium px-4 py-2 rounded-xl shadow-[var(--shadow-button)] transition-[var(--transition-smooth)] border border-[hsl(var(--btn-danger-hover))];
+  }
+
+  /* Problem Card */
+  .problem-card {
+    background: var(--gradient-card);
+    border: 1px solid hsl(var(--problem-border));
+    box-shadow: var(--shadow-card);
+    @apply rounded-2xl p-6 transition-[var(--transition-smooth)];
+  }
+  
+  /* Math Input */
+  .math-input {
+    @apply w-12 h-12 text-center text-xl font-bold bg-[hsl(var(--input-bg))] border border-[hsl(var(--input-border))] rounded-lg transition-[var(--transition-smooth)] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--input-focus))] focus:border-transparent;
+    color: hsl(var(--text-answer));
+  }
+  
+  .math-input.correct {
+    @apply border-[hsl(var(--input-correct))] bg-[hsl(var(--input-correct))] ring-2 ring-[hsl(var(--input-correct))];
+  }
+  
+  .math-input.incorrect {
+    @apply border-[hsl(var(--input-incorrect))] bg-[hsl(var(--input-incorrect))] ring-2 ring-[hsl(var(--input-incorrect))];
+  }
+
+  /* Segmented Button Groups */
+  .segmented-group {
+    @apply inline-flex rounded-xl p-1 bg-[hsl(var(--card-primary))] shadow-[var(--shadow-soft)];
+  }
+  
+  .segmented-btn {
+    @apply px-3 py-2 text-sm font-medium rounded-lg transition-[var(--transition-smooth)] text-[hsl(var(--text-secondary))];
+  }
+  
+  .segmented-btn.active {
+    @apply bg-white text-[hsl(var(--text-primary))] shadow-sm;
+  }
+
+  /* Timer Display */
+  .timer-display {
+    @apply bg-[hsl(var(--card-primary))] text-[hsl(var(--text-primary))] px-3 py-1 rounded-lg font-mono text-sm shadow-[var(--shadow-soft)];
+  }
+}
