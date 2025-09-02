@@ -781,10 +781,10 @@ const AdditionApp = () => {
                             <input
                               key={i}
                               type="text"
-                              maxLength="1"
+                               maxLength={1}
                               className="w-6 h-6 text-xs text-center border border-gray-300 rounded-sm mx-0.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                               value={(carryInputs[problemIndex] as string[])?.[i as number] || ''}
-                              onChange={(e) => handleCarryInputChange(problemIndex as number, i as number, e.target.value)}
+                              onChange={(e) => handleCarryInputChange(Number(problemIndex), Number(i), e.target.value)}
                               ref={(el) => {
                                 if (!carryInputRefs.current[problemIndex]) {
                                   carryInputRefs.current[problemIndex] = [];
@@ -873,7 +873,7 @@ const AdditionApp = () => {
                               <input
                                 key={i}
                                 type="text"
-                                maxLength="1"
+                                maxLength={1}
                                 className={`w-8 h-8 text-center border-2 rounded mx-0.5 font-bold focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                                   showAnswers 
                                     ? 'bg-blue-100 border-blue-300' 
@@ -884,9 +884,9 @@ const AdditionApp = () => {
                                     : 'border-gray-300'
                                 }`}
                                 value={(answers[problemIndex] as string[])?.[resultDigitIndex as number] || ''}
-                                onChange={(e) => handleInputChange(problemIndex as number, resultDigitIndex as number, e.target.value)}
-                                onKeyDown={(e) => handleKeyDown(problemIndex, resultDigitIndex, e)}
-                                onPaste={(e) => handlePaste(problemIndex, resultDigitIndex, e)}
+                                onChange={(e) => handleInputChange(Number(problemIndex), Number(resultDigitIndex), e.target.value)}
+                                 onKeyDown={(e) => handleKeyDown(Number(problemIndex), Number(resultDigitIndex), e)}
+                                 onPaste={(e) => handlePaste(Number(problemIndex), Number(resultDigitIndex), e)}
                                 ref={(el) => {
                                   if (!inputRefs.current[problemIndex]) {
                                     inputRefs.current[problemIndex] = [];
