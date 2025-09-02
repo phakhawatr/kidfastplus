@@ -636,7 +636,7 @@ const AdditionApp = () => {
 </head>
 <body>
     <div class="header">
-        <div class="title">การบวกที่ผลลัพธ์ไม่เกิน 1,000</div>
+        <div class="title">เทคนิคการบวกระดับโปร</div>
         <div class="subtitle">ใบงานฝึกหัด</div>
         <div class="info">จำนวนข้อ: ${count} | ระดับ: ${levelText} | จำนวนหลัก: ${digits} หลัก | จำนวนชุดตัวเลข: ${numberSet} จำนวน | การทด: ${carryText}</div>
         <div class="info">ชื่อ: _________________________ วันที่: _____________</div>
@@ -762,7 +762,7 @@ const AdditionApp = () => {
         {/* Header */}
         <div className="flex justify-between items-center mb-6 bg-white rounded-lg p-4 shadow-sm">
           <h1 className="text-2xl font-bold text-gray-800">
-            การบวกที่ผลลัพธ์ไม่เกิน 1,000
+            เทคนิคการบวกระดับโปร
           </h1>
           <div className="flex items-center gap-4">
             <span className="text-lg font-mono">
