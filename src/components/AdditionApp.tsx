@@ -33,12 +33,19 @@ const AdditionApp = () => {
     return () => clearInterval(interval);
   }, [startedAt, finishedAt]);
 
-  // Load statistics from localStorage
+  // Load statistics from localStorage and generate initial problems
   useEffect(() => {
     const savedStats = localStorage.getItem('addition-stats');
     if (savedStats) {
       setStatistics(JSON.parse(savedStats));
     }
+    
+    // Generate initial problems when component mounts
+    const initialProblems = generateAdditionProblems(10, 'easy', 1, 'none', 2);
+    setProblems(initialProblems);
+    setAnswers(new Array(10).fill(null).map(() => []));
+    setCarryInputs(new Array(10).fill(null).map(() => []));
+    setResults(new Array(10).fill('pending'));
   }, []);
 
   // Format time display
@@ -594,33 +601,50 @@ const AdditionApp = () => {
   };
   
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+    <div className="min-h-screen bg-gray-100 p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">
-            🧮 การบวกที่ผลลัพธ์ไม่เกิน 1,000
+        <div className="flex justify-between items-center mb-6 bg-white rounded-lg p-4 shadow-sm">
+          <h1 className="text-2xl font-bold text-gray-800">
+            การบวกที่ผลลัพธ์ไม่เกิน 1,000
           </h1>
-          <p className="text-gray-600">ฝึกหัดการบวกแบบตั้งกระดาน</p>
+          <div className="flex items-center gap-4">
+            <span className="text-lg font-mono">
+              เวลา: {formatTime(elapsedMs)}
+            </span>
+            <button
+              onClick={() => setShowStatsModal(true)}
+              className="bg-purple-100 text-purple-700 px-4 py-2 rounded-lg font-medium hover:bg-purple-200 transition-colors"
+            >
+              ดูผล
+            </button>
+            <button
+              onClick={openPrintWindow}
+              disabled={problems.length === 0}
+              className="bg-blue-100 text-blue-700 px-4 py-2 rounded-lg font-medium hover:bg-blue-200 transition-colors disabled:bg-gray-200 disabled:text-gray-500"
+            >
+              พิมพ์ PDF
+            </button>
+          </div>
         </div>
 
         {/* Controls */}
-        <div className="bg-white rounded-xl shadow-md p-6 mb-6">
-          <div className="space-y-6">
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+          <div className="grid grid-cols-5 gap-8">
             {/* จำนวนข้อ */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-3">
                 จำนวนข้อ
               </label>
-              <div className="flex flex-wrap gap-2">
+              <div className="space-y-2">
                 {[10, 15, 20, 30].map((num) => (
                   <button
                     key={num}
                     onClick={() => setCount(num)}
-                    className={`px-4 py-2 rounded-full border-2 font-medium transition-all ${
+                    className={`w-full px-3 py-2 rounded-lg font-medium transition-all ${
                       count === num
-                        ? 'bg-blue-100 border-blue-500 text-blue-700'
-                        : 'bg-gray-100 border-gray-300 text-gray-600 hover:bg-gray-200'
+                        ? 'bg-blue-200 text-blue-800 shadow-sm'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
                   >
                     {num}
@@ -634,33 +658,33 @@ const AdditionApp = () => {
               <label className="block text-sm font-medium text-gray-700 mb-3">
                 ระดับ
               </label>
-              <div className="flex flex-wrap gap-2">
+              <div className="space-y-2">
                 <button
                   onClick={() => setLevel('easy')}
-                  className={`px-4 py-2 rounded-full border-2 font-medium transition-all ${
+                  className={`w-full px-3 py-2 rounded-lg font-medium transition-all ${
                     level === 'easy'
-                      ? 'bg-green-100 border-green-500 text-green-700'
-                      : 'bg-gray-100 border-gray-300 text-gray-600 hover:bg-gray-200'
+                      ? 'bg-purple-200 text-purple-800 shadow-sm'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
                   ง่าย
                 </button>
                 <button
                   onClick={() => setLevel('medium')}
-                  className={`px-4 py-2 rounded-full border-2 font-medium transition-all ${
+                  className={`w-full px-3 py-2 rounded-lg font-medium transition-all ${
                     level === 'medium'
-                      ? 'bg-purple-100 border-purple-500 text-purple-700'
-                      : 'bg-gray-100 border-gray-300 text-gray-600 hover:bg-gray-200'
+                      ? 'bg-purple-200 text-purple-800 shadow-sm'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
                   ปานกลาง
                 </button>
                 <button
                   onClick={() => setLevel('hard')}
-                  className={`px-4 py-2 rounded-full border-2 font-medium transition-all ${
+                  className={`w-full px-3 py-2 rounded-lg font-medium transition-all ${
                     level === 'hard'
-                      ? 'bg-red-100 border-red-500 text-red-700'
-                      : 'bg-gray-100 border-gray-300 text-gray-600 hover:bg-gray-200'
+                      ? 'bg-purple-200 text-purple-800 shadow-sm'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
                   ยาก
@@ -673,15 +697,15 @@ const AdditionApp = () => {
               <label className="block text-sm font-medium text-gray-700 mb-3">
                 จำนวนหลัก
               </label>
-              <div className="flex flex-wrap gap-2">
+              <div className="space-y-2">
                 {[1, 2, 3].map((num) => (
                   <button
                     key={num}
                     onClick={() => setDigits(num)}
-                    className={`px-4 py-2 rounded-full border-2 font-medium transition-all ${
+                    className={`w-full px-3 py-2 rounded-lg font-medium transition-all ${
                       digits === num
-                        ? 'bg-cyan-100 border-cyan-500 text-cyan-700'
-                        : 'bg-gray-100 border-gray-300 text-gray-600 hover:bg-gray-200'
+                        ? 'bg-blue-200 text-blue-800 shadow-sm'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
                   >
                     {num} หลัก
@@ -690,28 +714,28 @@ const AdditionApp = () => {
               </div>
             </div>
 
-            {/* จำนวนชุดต่อเลข */}
+            {/* จำนวนชุดตัวเลข */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-3">
-                จำนวนชุดต่อเลข
+                จำนวนชุดตัวเลข
               </label>
-              <div className="flex flex-wrap gap-2">
+              <div className="space-y-2">
                 <button
                   onClick={() => setNumberSet(2)}
-                  className={`px-4 py-2 rounded-full border-2 font-medium transition-all ${
+                  className={`w-full px-3 py-2 rounded-lg font-medium transition-all ${
                     numberSet === 2
-                      ? 'bg-emerald-100 border-emerald-500 text-emerald-700'
-                      : 'bg-gray-100 border-gray-300 text-gray-600 hover:bg-gray-200'
+                      ? 'bg-green-200 text-green-800 shadow-sm'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
                   2 จำนวน
                 </button>
                 <button
                   onClick={() => setNumberSet(3)}
-                  className={`px-4 py-2 rounded-full border-2 font-medium transition-all ${
+                  className={`w-full px-3 py-2 rounded-lg font-medium transition-all ${
                     numberSet === 3
-                      ? 'bg-emerald-100 border-emerald-500 text-emerald-700'
-                      : 'bg-gray-100 border-gray-300 text-gray-600 hover:bg-gray-200'
+                      ? 'bg-green-200 text-green-800 shadow-sm'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
                   3 จำนวน
@@ -719,28 +743,28 @@ const AdditionApp = () => {
               </div>
             </div>
 
-            {/* การยืม */}
+            {/* การทด */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-3">
                 การทด
               </label>
-              <div className="flex flex-wrap gap-2">
+              <div className="space-y-2">
                 <button
                   onClick={() => setCarry('none')}
-                  className={`px-4 py-2 rounded-full border-2 font-medium transition-all ${
+                  className={`w-full px-3 py-2 rounded-lg font-medium transition-all ${
                     carry === 'none'
-                      ? 'bg-pink-100 border-pink-500 text-pink-700'
-                      : 'bg-gray-100 border-gray-300 text-gray-600 hover:bg-gray-200'
+                      ? 'bg-red-200 text-red-800 shadow-sm'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
                   ไม่มี
                 </button>
                 <button
                   onClick={() => setCarry('with')}
-                  className={`px-4 py-2 rounded-full border-2 font-medium transition-all ${
+                  className={`w-full px-3 py-2 rounded-lg font-medium transition-all ${
                     carry === 'with'
-                      ? 'bg-orange-100 border-orange-500 text-orange-700'
-                      : 'bg-gray-100 border-gray-300 text-gray-600 hover:bg-gray-200'
+                      ? 'bg-red-200 text-red-800 shadow-sm'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
                   มี
@@ -750,10 +774,10 @@ const AdditionApp = () => {
           </div>
 
           {/* Action Buttons */}
-          <div className="mt-6 flex flex-wrap gap-3 justify-center">
+          <div className="mt-6 flex gap-3 justify-center">
             <button
               onClick={generateNewSet}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-xl font-medium transition-colors shadow-lg hover:shadow-xl"
+              className="bg-blue-400 hover:bg-blue-500 text-white px-6 py-2 rounded-lg font-medium transition-colors"
             >
               สุ่มชุดใหม่
             </button>
@@ -761,27 +785,19 @@ const AdditionApp = () => {
             <button
               onClick={checkAnswers}
               disabled={!startedAt || !!finishedAt}
-              className="bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white px-6 py-3 rounded-xl font-medium transition-colors shadow-lg hover:shadow-xl disabled:shadow-none"
+              className="bg-green-400 hover:bg-green-500 disabled:bg-gray-300 text-white px-6 py-2 rounded-lg font-medium transition-colors"
             >
               ตรวจคำตอบ
             </button>
             
             <button
               onClick={showAllAnswers}
-              className="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl font-medium transition-colors shadow-lg hover:shadow-xl"
+              className="bg-red-400 hover:bg-red-500 text-white px-6 py-2 rounded-lg font-medium transition-colors"
             >
               เฉลยทั้งหมด
             </button>
           </div>
 
-          {/* Timer */}
-          {startedAt && (
-            <div className="text-center mt-4">
-              <span className="text-2xl font-mono font-bold text-blue-600">
-                ⏱️ {formatTime(elapsedMs)}
-              </span>
-            </div>
-          )}
         </div>
 
         {/* Problems Grid */}
