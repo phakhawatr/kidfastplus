@@ -606,126 +606,171 @@ const AdditionApp = () => {
 
         {/* Controls */}
         <div className="bg-white rounded-xl shadow-md p-6 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-4">
+          <div className="space-y-6">
             {/* จำนวนข้อ */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-3">
                 จำนวนข้อ
               </label>
-              <select
-                value={count}
-                onChange={(e) => setCount(parseInt(e.target.value))}
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value={5}>5 ข้อ</option>
-                <option value={10}>10 ข้อ</option>
-                <option value={15}>15 ข้อ</option>
-                <option value={20}>20 ข้อ</option>
-                <option value={25}>25 ข้อ</option>
-                <option value={30}>30 ข้อ</option>
-              </select>
+              <div className="flex flex-wrap gap-2">
+                {[10, 15, 20, 30].map((num) => (
+                  <button
+                    key={num}
+                    onClick={() => setCount(num)}
+                    className={`px-4 py-2 rounded-full border-2 font-medium transition-all ${
+                      count === num
+                        ? 'bg-blue-100 border-blue-500 text-blue-700'
+                        : 'bg-gray-100 border-gray-300 text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    {num}
+                  </button>
+                ))}
+              </div>
             </div>
 
-            {/* ระดับความยาก */}
+            {/* ระดับ */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                ระดับความยาก
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                ระดับ
               </label>
-              <select
-                value={level}
-                onChange={(e) => setLevel(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="easy">ง่าย</option>
-                <option value="medium">ปานกลาง</option>
-                <option value="hard">ยาก</option>
-              </select>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => setLevel('easy')}
+                  className={`px-4 py-2 rounded-full border-2 font-medium transition-all ${
+                    level === 'easy'
+                      ? 'bg-green-100 border-green-500 text-green-700'
+                      : 'bg-gray-100 border-gray-300 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  ง่าย
+                </button>
+                <button
+                  onClick={() => setLevel('medium')}
+                  className={`px-4 py-2 rounded-full border-2 font-medium transition-all ${
+                    level === 'medium'
+                      ? 'bg-purple-100 border-purple-500 text-purple-700'
+                      : 'bg-gray-100 border-gray-300 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  ปานกลาง
+                </button>
+                <button
+                  onClick={() => setLevel('hard')}
+                  className={`px-4 py-2 rounded-full border-2 font-medium transition-all ${
+                    level === 'hard'
+                      ? 'bg-red-100 border-red-500 text-red-700'
+                      : 'bg-gray-100 border-gray-300 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  ยาก
+                </button>
+              </div>
             </div>
 
             {/* จำนวนหลัก */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-3">
                 จำนวนหลัก
               </label>
-              <select
-                value={digits}
-                onChange={(e) => setDigits(parseInt(e.target.value))}
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value={1}>1 หลัก</option>
-                <option value={2}>2 หลัก</option>
-                <option value={3}>3 หลัก</option>
-              </select>
+              <div className="flex flex-wrap gap-2">
+                {[1, 2, 3].map((num) => (
+                  <button
+                    key={num}
+                    onClick={() => setDigits(num)}
+                    className={`px-4 py-2 rounded-full border-2 font-medium transition-all ${
+                      digits === num
+                        ? 'bg-cyan-100 border-cyan-500 text-cyan-700'
+                        : 'bg-gray-100 border-gray-300 text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    {num} หลัก
+                  </button>
+                ))}
+              </div>
             </div>
 
-            {/* การทด */}
+            {/* จำนวนชุดต่อเลข */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                จำนวนชุดต่อเลข
+              </label>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => setNumberSet(2)}
+                  className={`px-4 py-2 rounded-full border-2 font-medium transition-all ${
+                    numberSet === 2
+                      ? 'bg-emerald-100 border-emerald-500 text-emerald-700'
+                      : 'bg-gray-100 border-gray-300 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  2 จำนวน
+                </button>
+                <button
+                  onClick={() => setNumberSet(3)}
+                  className={`px-4 py-2 rounded-full border-2 font-medium transition-all ${
+                    numberSet === 3
+                      ? 'bg-emerald-100 border-emerald-500 text-emerald-700'
+                      : 'bg-gray-100 border-gray-300 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  3 จำนวน
+                </button>
+              </div>
+            </div>
+
+            {/* การยืม */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">
                 การทด
               </label>
-              <select
-                value={carry}
-                onChange={(e) => setCarry(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="none">ไม่มี</option>
-                <option value="with">มี</option>
-              </select>
-            </div>
-
-            {/* จำนวนชุดตัวเลข */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                จำนวนชุดตัวเลข
-              </label>
-              <select
-                value={numberSet}
-                onChange={(e) => setNumberSet(parseInt(e.target.value))}
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value={2}>2 จำนวน (A + B = ?)</option>
-                <option value={3}>3 จำนวน (A + B + C = ?)</option>
-              </select>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => setCarry('none')}
+                  className={`px-4 py-2 rounded-full border-2 font-medium transition-all ${
+                    carry === 'none'
+                      ? 'bg-pink-100 border-pink-500 text-pink-700'
+                      : 'bg-gray-100 border-gray-300 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  ไม่มี
+                </button>
+                <button
+                  onClick={() => setCarry('with')}
+                  className={`px-4 py-2 rounded-full border-2 font-medium transition-all ${
+                    carry === 'with'
+                      ? 'bg-orange-100 border-orange-500 text-orange-700'
+                      : 'bg-gray-100 border-gray-300 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  มี
+                </button>
+              </div>
             </div>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex flex-wrap gap-3 justify-center">
+          <div className="mt-6 flex flex-wrap gap-3 justify-center">
             <button
               onClick={generateNewSet}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+              className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-xl font-medium transition-colors shadow-lg hover:shadow-xl"
             >
-              🎲 สร้างโจทย์ใหม่
+              สุ่มชุดใหม่
             </button>
             
             <button
               onClick={checkAnswers}
               disabled={!startedAt || !!finishedAt}
-              className="bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+              className="bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white px-6 py-3 rounded-xl font-medium transition-colors shadow-lg hover:shadow-xl disabled:shadow-none"
             >
-              ✅ ตรวจคำตอบ
+              ตรวจคำตอบ
             </button>
             
             <button
               onClick={showAllAnswers}
-              className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+              className="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl font-medium transition-colors shadow-lg hover:shadow-xl"
             >
-              👁️ แสดงเฉลย
-            </button>
-            
-            <button
-              onClick={openPrintWindow}
-              disabled={problems.length === 0}
-              className="bg-purple-500 hover:bg-purple-600 disabled:bg-gray-400 text-white px-6 py-2 rounded-lg font-medium transition-colors"
-            >
-              🖨️ พิมพ์ PDF
-            </button>
-            
-            <button
-              onClick={() => setShowStatsModal(true)}
-              className="bg-indigo-500 hover:bg-indigo-600 text-white px-6 py-2 rounded-lg font-medium transition-colors"
-            >
-              📊 สถิติ
+              เฉลยทั้งหมด
             </button>
           </div>
 
