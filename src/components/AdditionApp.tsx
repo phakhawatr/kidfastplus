@@ -64,13 +64,12 @@ const AdditionApp = () => {
     const maxAttempts = count * 10; // Prevent infinite loops
     let attempts = 0;
 
-    // Define digit sets based on level
+    // Define digit sets based on international mathematical standards
     const getDigitSet = (level: string) => {
       switch(level) {
-        case 'easy': return [1, 2, 3, 4, 5];
-        case 'medium': return [3, 4, 5, 6, 7];
-        case 'hard': return [0, 3, 4, 5, 6, 7, 8, 9]; // ยาก: 3,4,5,6,7,8,9,0
-        case 'olympic': return [0, 6, 7, 8, 9]; // โอลิมปิก: 6,7,8,9,0
+        case 'easy': return [1, 2, 3, 4, 5]; // ง่าย: ตัวเลขเล็ก 1-5
+        case 'medium': return [1, 2, 3, 4, 5, 6, 7]; // ปานกลาง: ตัวเลขกลาง 1-7
+        case 'hard': return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]; // ยาก: ตัวเลขทั้งหมด 0-9
         default: return [1, 2, 3, 4, 5, 6, 7, 8, 9];
       }
     };
@@ -430,7 +429,7 @@ const AdditionApp = () => {
 
   // Generate print content
   const generatePrintContent = () => {
-    const levelText = level === 'easy' ? 'ง่าย' : level === 'medium' ? 'ปานกลาง' : level === 'hard' ? 'ยาก' : 'โอลิมปิก';
+    const levelText = level === 'easy' ? 'ง่าย' : level === 'medium' ? 'ปานกลาง' : 'ยาก';
     const carryText = carry === 'none' ? 'ไม่มี' : 'มี'; // เปลี่ยนจาก borrowText
     
     return `
@@ -825,19 +824,6 @@ const AdditionApp = () => {
                   }`}
                 >
                   ยาก
-                </button>
-                <button
-                  onClick={() => { 
-                    setLevel('olympic'); 
-                    generateNewSetWithParams(count, 'olympic', digits, carry, numberSet);
-                  }}
-                  className={`w-full px-3 py-2 rounded-lg font-medium transition-all ${
-                    level === 'olympic'
-                      ? 'bg-purple-200 text-purple-800 shadow-sm'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
-                >
-                  โอลิมปิก
                 </button>
               </div>
             </div>
