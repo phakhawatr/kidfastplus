@@ -7,20 +7,20 @@ const AdditionApp = () => {
   const [digits, setDigits] = useState(1);
   const [carry, setCarry] = useState('none'); // เปลี่ยนจาก borrow เป็น carry
   const [numberSet, setNumberSet] = useState(2); // 2 = show 2 numbers (A + B = ?), 3 = show 3 numbers (A + B + C = ?)
-  const [problems, setProblems] = useState([]);
-  const [answers, setAnswers] = useState([]);
-  const [carryInputs, setCarryInputs] = useState([]); // เพิ่มสำหรับช่องทดเลข
-  const [results, setResults] = useState([]);
-  const [startedAt, setStartedAt] = useState(null);
-  const [finishedAt, setFinishedAt] = useState(null);
+  const [problems, setProblems] = useState<any[]>([]);
+  const [answers, setAnswers] = useState<string[][]>([]);
+  const [carryInputs, setCarryInputs] = useState<string[][]>([]); // เพิ่มสำหรับช่องทดเลข
+  const [results, setResults] = useState<string[]>([]);
+  const [startedAt, setStartedAt] = useState<number | null>(null);
+  const [finishedAt, setFinishedAt] = useState<number | null>(null);
   const [elapsedMs, setElapsedMs] = useState(0);
   const [showAnswers, setShowAnswers] = useState(false);
   const [showResultModal, setShowResultModal] = useState(false);
   const [showStatsModal, setShowStatsModal] = useState(false);
-  const [statistics, setStatistics] = useState([]);
+  const [statistics, setStatistics] = useState<any[]>([]);
   
-  const inputRefs = useRef([]);
-  const carryInputRefs = useRef([]); // เพิ่ม ref สำหรับช่องทดเลข
+  const inputRefs = useRef<any[]>([]);
+  const carryInputRefs = useRef<any[]>([]); // เพิ่ม ref สำหรับช่องทดเลข
 
   // Timer effect
   useEffect(() => {
@@ -42,7 +42,7 @@ const AdditionApp = () => {
   }, []);
 
   // Format time display
-  const formatTime = (ms) => {
+  const formatTime = (ms: number) => {
     const seconds = Math.floor(ms / 1000);
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
@@ -50,7 +50,7 @@ const AdditionApp = () => {
   };
 
   // Generate addition problems based on settings
-  const generateAdditionProblems = (count, level, digits, carry, numberSet) => {
+  const generateAdditionProblems = (count: number, level: string, digits: number, carry: string, numberSet: number) => {
     const problems = [];
     const maxAttempts = count * 10; // Prevent infinite loops
     let attempts = 0;
@@ -160,7 +160,7 @@ const AdditionApp = () => {
   };
 
   // Handle input change
-  const handleInputChange = (problemIndex, digitIndex, value) => {
+  const handleInputChange = (problemIndex: number, digitIndex: number, value: string) => {
     if (!startedAt) {
       setStartedAt(Date.now());
     }
@@ -184,7 +184,7 @@ const AdditionApp = () => {
   };
 
   // Handle carry input change
-  const handleCarryInputChange = (problemIndex, digitIndex, value) => {
+  const handleCarryInputChange = (problemIndex: number, digitIndex: number, value: string) => {
     if (/^\d$/.test(value) || value === '') {
       const newCarryInputs = [...carryInputs];
       if (!newCarryInputs[problemIndex]) {
@@ -196,7 +196,7 @@ const AdditionApp = () => {
   };
 
   // Handle backspace navigation
-  const handleKeyDown = (problemIndex, digitIndex, e) => {
+  const handleKeyDown = (problemIndex: number, digitIndex: number, e: React.KeyboardEvent) => {
     if (e.key === 'Backspace' && !answers[problemIndex]?.[digitIndex] && digitIndex > 0) {
       const prevInput = inputRefs.current[problemIndex]?.[digitIndex - 1];
       if (prevInput) {
@@ -214,7 +214,7 @@ const AdditionApp = () => {
   };
 
   // Handle paste
-  const handlePaste = (problemIndex, digitIndex, e) => {
+  const handlePaste = (problemIndex: number, digitIndex: number, e: React.ClipboardEvent) => {
     e.preventDefault();
     const pastedText = e.clipboardData.getData('text');
     const digits = pastedText.replace(/\D/g, '').split('');
@@ -592,8 +592,6 @@ const AdditionApp = () => {
 </html>
     `;
   };
-
-  // Rest of the component... (continuing in next part due to length)
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
@@ -702,7 +700,7 @@ const AdditionApp = () => {
             
             <button
               onClick={checkAnswers}
-              disabled={!startedAt || finishedAt}
+              disabled={!startedAt || !!finishedAt}
               className="bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white px-6 py-2 rounded-lg font-medium transition-colors"
             >
               ✅ ตรวจคำตอบ
@@ -785,8 +783,8 @@ const AdditionApp = () => {
                               type="text"
                               maxLength="1"
                               className="w-6 h-6 text-xs text-center border border-gray-300 rounded-sm mx-0.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                              value={carryInputs[problemIndex]?.[i] || ''}
-<parameter name="onChange">(e) => handleCarryInputChange(problemIndex, i, e.target.value)
+                              value={(carryInputs[problemIndex] as string[])?.[i as number] || ''}
+                              onChange={(e) => handleCarryInputChange(problemIndex as number, i as number, e.target.value)}
                               ref={(el) => {
                                 if (!carryInputRefs.current[problemIndex]) {
                                   carryInputRefs.current[problemIndex] = [];
@@ -885,8 +883,8 @@ const AdditionApp = () => {
                                     ? 'bg-red-100 border-red-300'
                                     : 'border-gray-300'
                                 }`}
-                                value={answers[problemIndex]?.[resultDigitIndex] || ''}
-                                onChange={(e) => handleInputChange(problemIndex, resultDigitIndex, e.target.value)}
+                                value={(answers[problemIndex] as string[])?.[resultDigitIndex as number] || ''}
+                                onChange={(e) => handleInputChange(problemIndex as number, resultDigitIndex as number, e.target.value)}
                                 onKeyDown={(e) => handleKeyDown(problemIndex, resultDigitIndex, e)}
                                 onPaste={(e) => handlePaste(problemIndex, resultDigitIndex, e)}
                                 ref={(el) => {
