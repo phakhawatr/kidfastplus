@@ -104,10 +104,9 @@ const AdditionApp = () => {
       let addend1, addend2, addend3;
       
       if (numberSet === 2) {
-        // Regular A + B = ? problem
+        // Regular A + B = ? problem  
         addend1 = generateNumberWithDigitRange(digits, digitRange.min, digitRange.max);
-        addend2 = generateNumberWithDigitRange(digits, digitRange.min, digitRange.max);
-
+        
         if (carry === 'none') {
           // Ensure no carrying by adjusting addend2
           const addend1Str = addend1.toString().padStart(digits, '0');
@@ -128,7 +127,7 @@ const AdditionApp = () => {
               addend2Digits.push(Math.floor(Math.random() * (maxAllowed - minAllowed + 1)) + minAllowed);
             } else {
               // Skip this problem if no valid digit can be generated
-              continue;
+              break;
             }
           }
           
@@ -137,6 +136,9 @@ const AdditionApp = () => {
           } else {
             continue; // Skip this iteration
           }
+        } else {
+          // Allow carrying - generate second addend within digit range
+          addend2 = generateNumberWithDigitRange(digits, digitRange.min, digitRange.max);
         }
 
         const result = addend1 + addend2;
@@ -215,9 +217,9 @@ const AdditionApp = () => {
   // Get answer box count based on mathematical principles
   const getAnswerBoxCount = (digits: number) => {
     switch(digits) {
-      case 1: return 2; // 1 digit + tens place
-      case 2: return 4; // 2 digits + hundreds + thousands  
-      case 3: return 5; // 3 digits + thousands + ten-thousands
+      case 1: return 2; // 1 digit problem can result in 2 digits max
+      case 2: return 3; // 2 digit problem can result in 3 digits max  
+      case 3: return 4; // 3 digit problem can result in 4 digits max
       default: return digits + 1;
     }
   };
@@ -943,30 +945,30 @@ const AdditionApp = () => {
                     </h3>
                     
                     <div className="font-mono text-xl space-y-1">
-                      {/* Carry Row */}
-                      <div className="flex justify-center items-center h-8">
-                        {Array.from({ length: maxLength }, (_, i) => {
-                          if (i === 0) {
-                            return <div key={i} className="w-8"></div>;
-                          }
-                          return (
-                            <input
-                              key={i}
-                              type="text"
-                               maxLength={1}
-                              className="w-6 h-6 text-xs text-center border border-gray-300 rounded-sm mx-0.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                              value={(carryInputs[problemIndex] as string[])?.[i as number] || ''}
-                              onChange={(e) => handleCarryInputChange(Number(problemIndex), Number(i), e.target.value)}
-                              ref={(el) => {
-                                if (!carryInputRefs.current[problemIndex]) {
-                                  carryInputRefs.current[problemIndex] = [];
-                                }
-                                carryInputRefs.current[problemIndex][i] = el;
-                              }}
-                            />
-                          );
-                        })}
-                      </div>
+                       {/* Carry Row */}
+                       <div className="flex justify-center items-center h-8">
+                         {Array.from({ length: answerBoxCount }, (_, i) => {
+                           if (i === 0) {
+                             return <div key={i} className="w-8"></div>;
+                           }
+                           return (
+                             <input
+                               key={i}
+                               type="text"
+                                maxLength={1}
+                               className="w-6 h-6 text-xs text-center border border-gray-300 rounded-sm mx-0.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                               value={(carryInputs[problemIndex] as string[])?.[i as number] || ''}
+                               onChange={(e) => handleCarryInputChange(Number(problemIndex), Number(i), e.target.value)}
+                               ref={(el) => {
+                                 if (!carryInputRefs.current[problemIndex]) {
+                                   carryInputRefs.current[problemIndex] = [];
+                                 }
+                                 carryInputRefs.current[problemIndex][i] = el;
+                               }}
+                             />
+                           );
+                         })}
+                       </div>
 
                       {/* First addend */}
                       <div className="flex justify-center items-center">
@@ -1034,44 +1036,37 @@ const AdditionApp = () => {
                         ></div>
                       </div>
 
-                      {/* Answer row */}
-                      <div className="flex justify-center items-center">
-                        {Array.from({ length: maxLength }, (_, i) => {
-                          const digitPos = maxLength - 1 - i;
-                          const answerBoxIndex = answerBoxCount - 1 - digitPos;
-                          
-                          if (answerBoxIndex >= 0 && answerBoxIndex < answerBoxCount) {
-                            return (
-                              <input
-                                key={i}
-                                type="text"
-                                maxLength={1}
-                                className={`w-8 h-8 text-center border-2 rounded mx-0.5 font-bold focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                  showAnswers 
-                                    ? 'bg-blue-100 border-blue-300' 
-                                    : results[problemIndex] === 'correct'
-                                    ? 'bg-green-100 border-green-300'
-                                    : results[problemIndex] === 'incorrect'
-                                    ? 'bg-red-100 border-red-300'
-                                    : 'border-gray-300'
-                                }`}
-                                value={(answers[problemIndex] as string[])?.[answerBoxIndex as number] || ''}
-                                onChange={(e) => handleInputChange(Number(problemIndex), Number(answerBoxIndex), e.target.value)}
-                                 onKeyDown={(e) => handleKeyDown(Number(problemIndex), Number(answerBoxIndex), e)}
-                                 onPaste={(e) => handlePaste(Number(problemIndex), Number(answerBoxIndex), e)}
-                                ref={(el) => {
-                                  if (!inputRefs.current[problemIndex]) {
-                                    inputRefs.current[problemIndex] = [];
-                                  }
-                                  inputRefs.current[problemIndex][answerBoxIndex] = el;
-                                }}
-                              />
-                            );
-                          } else {
-                            return <div key={i} className="w-8"></div>;
-                          }
-                        })}
-                      </div>
+                       {/* Answer row */}
+                       <div className="flex justify-center items-center">
+                         {Array.from({ length: answerBoxCount }, (_, i) => {
+                           return (
+                             <input
+                               key={i}
+                               type="text"
+                               maxLength={1}
+                               className={`w-8 h-8 text-center border-2 rounded mx-0.5 font-bold focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                                 showAnswers 
+                                   ? 'bg-blue-100 border-blue-300' 
+                                   : results[problemIndex] === 'correct'
+                                   ? 'bg-green-100 border-green-300'
+                                   : results[problemIndex] === 'incorrect'
+                                   ? 'bg-red-100 border-red-300'
+                                   : 'border-gray-300'
+                               }`}
+                               value={(answers[problemIndex] as string[])?.[i as number] || ''}
+                               onChange={(e) => handleInputChange(Number(problemIndex), Number(i), e.target.value)}
+                                onKeyDown={(e) => handleKeyDown(Number(problemIndex), Number(i), e)}
+                                onPaste={(e) => handlePaste(Number(problemIndex), Number(i), e)}
+                               ref={(el) => {
+                                 if (!inputRefs.current[problemIndex]) {
+                                   inputRefs.current[problemIndex] = [];
+                                 }
+                                 inputRefs.current[problemIndex][i] = el;
+                               }}
+                             />
+                           );
+                         })}
+                       </div>
 
                       {/* Show correct answer if incorrect */}
                       {results[problemIndex] === 'incorrect' && (
