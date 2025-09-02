@@ -80,11 +80,19 @@ const AdditionApp = () => {
       let result = '';
       for (let i = 0; i < numDigits; i++) {
         if (i === 0) {
-          // First digit cannot be 0
+          // First digit cannot be 0, but must be within range
           const min = Math.max(1, minDigit);
-          result += Math.floor(Math.random() * (maxDigit - min + 1)) + min;
+          const max = maxDigit;
+          if (min <= max) {
+            result += Math.floor(Math.random() * (max - min + 1)) + min;
+          } else {
+            result += '1'; // fallback
+          }
         } else {
-          result += Math.floor(Math.random() * (maxDigit - minDigit + 1)) + minDigit;
+          // Other digits can be 0-9 but within the specified range
+          const min = Math.max(0, minDigit);
+          const max = maxDigit;
+          result += Math.floor(Math.random() * (max - min + 1)) + min;
         }
       }
       return parseInt(result);
@@ -101,34 +109,33 @@ const AdditionApp = () => {
         addend2 = generateNumberWithDigitRange(digits, digitRange.min, digitRange.max);
 
         if (carry === 'none') {
-          // Ensure no carrying by regenerating addend2 if needed
+          // Ensure no carrying by adjusting addend2
           const addend1Str = addend1.toString().padStart(digits, '0');
-          const addend2Str = addend2.toString().padStart(digits, '0');
+          const addend2Digits = [];
           
-          let needsRegeneration = false;
           for (let i = 0; i < digits; i++) {
-            if (parseInt(addend1Str[i]) + parseInt(addend2Str[i]) >= 10) {
-              needsRegeneration = true;
-              break;
+            const digit1 = parseInt(addend1Str[i]);
+            const maxAllowed = Math.min(9 - digit1, digitRange.max);
+            let minAllowed = digitRange.min;
+            
+            if (i === 0) {
+              minAllowed = Math.max(1, digitRange.min); // First digit cannot be 0
+            } else {
+              minAllowed = Math.max(0, digitRange.min); // Other digits can be 0
+            }
+            
+            if (maxAllowed >= minAllowed) {
+              addend2Digits.push(Math.floor(Math.random() * (maxAllowed - minAllowed + 1)) + minAllowed);
+            } else {
+              // Skip this problem if no valid digit can be generated
+              continue;
             }
           }
           
-          if (needsRegeneration) {
-            // Regenerate addend2 to avoid carrying
-            const addend1Digits = addend1Str.split('').map(Number);
-            const addend2Digits = [];
-            
-            for (let i = 0; i < addend1Digits.length; i++) {
-              const maxAllowed = Math.min(9 - addend1Digits[i], digitRange.max);
-              const minAllowed = Math.max(digitRange.min, i === 0 ? 1 : 0);
-              if (maxAllowed >= minAllowed) {
-                addend2Digits.push(Math.floor(Math.random() * (maxAllowed - minAllowed + 1)) + minAllowed);
-              } else {
-                // Skip this problem if no valid digit can be generated
-                continue;
-              }
-            }
+          if (addend2Digits.length === digits) {
             addend2 = parseInt(addend2Digits.join(''));
+          } else {
+            continue; // Skip this iteration
           }
         }
 
@@ -929,7 +936,7 @@ const AdditionApp = () => {
                   }`}
                 >
                   <div className="text-center">
-                    <h3 className="text-lg font-bold text-gray-800 mb-4">
+                    <h3 className="text-lg font-bold text-gray-800 mb-4 text-left">
                       ⭐ ข้อ {problemIndex + 1}
                       {results[problemIndex] === 'correct' && <span className="text-green-600 ml-2">✅</span>}
                       {results[problemIndex] === 'incorrect' && <span className="text-red-600 ml-2">❌</span>}
