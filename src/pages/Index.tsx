@@ -1,7 +1,7 @@
-import SubtractionApp from "../components/SubtractionApp";
+import AdditionApp from "../components/AdditionApp";
 
 const Index = () => {
-  return <SubtractionApp />;
+  return <AdditionApp />;
 };
 
 export default Index;
