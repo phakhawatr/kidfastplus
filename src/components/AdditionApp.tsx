@@ -58,6 +58,8 @@ const AdditionApp = () => {
 
   // Generate addition problems based on settings
   const generateAdditionProblems = (count: number, level: string, digits: number, carry: string, numberSet: number) => {
+    console.log('Generating problems with:', { count, level, digits, carry, numberSet });
+    
     const problems = [];
     const maxAttempts = count * 10; // Prevent infinite loops
     let attempts = 0;
@@ -74,6 +76,7 @@ const AdditionApp = () => {
     };
 
     const digitRange = getDigitRange(level);
+    console.log('Digit range for level', level, ':', digitRange);
 
     // Helper function to generate a number with specific digit constraints
     const generateNumberWithDigitRange = (numDigits: number, minDigit: number, maxDigit: number) => {
@@ -180,6 +183,8 @@ const AdditionApp = () => {
       }
     }
 
+    console.log('Generated', problems.length, 'problems out of', count, 'requested');
+    console.log('Problems:', problems);
     return problems;
   };
 
