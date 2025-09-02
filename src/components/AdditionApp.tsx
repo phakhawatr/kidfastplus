@@ -142,8 +142,23 @@ const AdditionApp = () => {
             continue; // Skip this iteration
           }
         } else {
-          // Allow carrying - generate second addend with digit set
+          // Force carrying - ensure units digits sum > 10
           addend2 = generateNumberWithDigitSet(digits, digitSet);
+          
+          // Ensure carry occurs by checking units digits
+          const addend1UnitsDigit = addend1 % 10;
+          let addend2UnitsDigit = addend2 % 10;
+          
+          // If sum of units digits <= 10, adjust addend2 to force carry
+          if (addend1UnitsDigit + addend2UnitsDigit <= 10) {
+            // Find a valid units digit that creates carry
+            const availableDigits = digitSet.filter(d => addend1UnitsDigit + d > 10);
+            if (availableDigits.length > 0) {
+              const newUnitsDigit = availableDigits[Math.floor(Math.random() * availableDigits.length)];
+              // Replace units digit of addend2
+              addend2 = Math.floor(addend2 / 10) * 10 + newUnitsDigit;
+            }
+          }
         }
 
         const result = addend1 + addend2;
@@ -209,10 +224,27 @@ const AdditionApp = () => {
             continue; // Skip this iteration
           }
         } else {
-          // Allow carrying - generate all addends with digit set
+          // Force carrying for 3-number problems - ensure units digits sum > 10
           addend1 = generateNumberWithDigitSet(digits, digitSet);
           addend2 = generateNumberWithDigitSet(digits, digitSet);
           addend3 = generateNumberWithDigitSet(digits, digitSet);
+          
+          // Ensure carry occurs by checking units digits
+          const addend1UnitsDigit = addend1 % 10;
+          const addend2UnitsDigit = addend2 % 10;
+          let addend3UnitsDigit = addend3 % 10;
+          
+          // If sum of units digits <= 10, adjust addend3 to force carry
+          if (addend1UnitsDigit + addend2UnitsDigit + addend3UnitsDigit <= 10) {
+            // Find a valid units digit that creates carry
+            const minNeededDigit = 11 - addend1UnitsDigit - addend2UnitsDigit;
+            const availableDigits = digitSet.filter(d => d >= minNeededDigit);
+            if (availableDigits.length > 0) {
+              const newUnitsDigit = availableDigits[Math.floor(Math.random() * availableDigits.length)];
+              // Replace units digit of addend3
+              addend3 = Math.floor(addend3 / 10) * 10 + newUnitsDigit;
+            }
+          }
         }
         
         const result = addend1 + addend2 + addend3;
