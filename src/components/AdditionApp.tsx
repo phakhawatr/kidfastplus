@@ -62,41 +62,74 @@ const AdditionApp = () => {
     const maxAttempts = count * 10; // Prevent infinite loops
     let attempts = 0;
 
+    // Define digit ranges based on level
+    const getDigitRange = (level: string) => {
+      switch(level) {
+        case 'easy': return { min: 1, max: 5 };
+        case 'medium': return { min: 3, max: 7 };
+        case 'hard': return { min: 3, max: 9 };
+        case 'olympic': return { min: 7, max: 9 };
+        default: return { min: 1, max: 9 };
+      }
+    };
+
+    const digitRange = getDigitRange(level);
+
+    // Helper function to generate a number with specific digit constraints
+    const generateNumberWithDigitRange = (numDigits: number, minDigit: number, maxDigit: number) => {
+      let result = '';
+      for (let i = 0; i < numDigits; i++) {
+        if (i === 0) {
+          // First digit cannot be 0
+          const min = Math.max(1, minDigit);
+          result += Math.floor(Math.random() * (maxDigit - min + 1)) + min;
+        } else {
+          result += Math.floor(Math.random() * (maxDigit - minDigit + 1)) + minDigit;
+        }
+      }
+      return parseInt(result);
+    };
+
     while (problems.length < count && attempts < maxAttempts) {
       attempts++;
-      
-      // Generate numbers based on digit count
-      const min = digits === 1 ? 1 : Math.pow(10, digits - 1);
-      const max = Math.pow(10, digits) - 1;
       
       let addend1, addend2, addend3;
       
       if (numberSet === 2) {
         // Regular A + B = ? problem
+        addend1 = generateNumberWithDigitRange(digits, digitRange.min, digitRange.max);
+        addend2 = generateNumberWithDigitRange(digits, digitRange.min, digitRange.max);
+
         if (carry === 'none') {
-          // No carrying - sum of each digit position should be < 10
-          addend1 = Math.floor(Math.random() * (max - min + 1)) + min;
-          const addend1Digits = addend1.toString().split('').map(Number);
-          const addend2Digits = [];
+          // Ensure no carrying by regenerating addend2 if needed
+          const addend1Str = addend1.toString().padStart(digits, '0');
+          const addend2Str = addend2.toString().padStart(digits, '0');
           
-          for (let i = 0; i < addend1Digits.length; i++) {
-            const maxDigit = Math.min(9 - addend1Digits[i], 
-              level === 'easy' ? 3 : 
-              level === 'medium' ? 5 : 
-              9 - addend1Digits[i]);
-            addend2Digits.push(Math.floor(Math.random() * (maxDigit + 1)));
+          let needsRegeneration = false;
+          for (let i = 0; i < digits; i++) {
+            if (parseInt(addend1Str[i]) + parseInt(addend2Str[i]) >= 10) {
+              needsRegeneration = true;
+              break;
+            }
           }
-          addend2 = parseInt(addend2Digits.join(''));
-        } else {
-          // Allow carrying
-          const maxSum = Math.pow(10, digits + 1) - 1; // Allow one extra digit for result
-          addend1 = Math.floor(Math.random() * (max - min + 1)) + min;
-          const maxAddend2 = Math.min(max, maxSum - addend1);
-          const minAddend2 = level === 'easy' ? Math.floor(max * 0.1) :
-                            level === 'medium' ? Math.floor(max * 0.3) :
-                            Math.floor(max * 0.5);
           
-          addend2 = Math.floor(Math.random() * (maxAddend2 - minAddend2 + 1)) + minAddend2;
+          if (needsRegeneration) {
+            // Regenerate addend2 to avoid carrying
+            const addend1Digits = addend1Str.split('').map(Number);
+            const addend2Digits = [];
+            
+            for (let i = 0; i < addend1Digits.length; i++) {
+              const maxAllowed = Math.min(9 - addend1Digits[i], digitRange.max);
+              const minAllowed = Math.max(digitRange.min, i === 0 ? 1 : 0);
+              if (maxAllowed >= minAllowed) {
+                addend2Digits.push(Math.floor(Math.random() * (maxAllowed - minAllowed + 1)) + minAllowed);
+              } else {
+                // Skip this problem if no valid digit can be generated
+                continue;
+              }
+            }
+            addend2 = parseInt(addend2Digits.join(''));
+          }
         }
 
         const result = addend1 + addend2;
@@ -116,29 +149,24 @@ const AdditionApp = () => {
         }
       } else {
         // A + B + C = ? problem
-        const maxSum = Math.pow(10, digits + 1) - 1;
-        addend1 = Math.floor(Math.random() * (max - min + 1)) + min;
-        addend2 = Math.floor(Math.random() * (max - min + 1)) + min;
+        addend1 = generateNumberWithDigitRange(digits, digitRange.min, digitRange.max);
+        addend2 = generateNumberWithDigitRange(digits, digitRange.min, digitRange.max);
+        addend3 = generateNumberWithDigitRange(digits, digitRange.min, digitRange.max);
         
-        const remainingSum = maxSum - addend1 - addend2;
-        if (remainingSum >= min) {
-          addend3 = Math.floor(Math.random() * Math.min(remainingSum - min + 1, max - min + 1)) + min;
+        const result = addend1 + addend2 + addend3;
+        
+        if (result <= 1000 && addend1 > 0 && addend2 > 0 && addend3 > 0) {
+          const resultStr = result.toString();
+          const resultDigits = resultStr.split('').map(Number);
           
-          const result = addend1 + addend2 + addend3;
-          
-          if (result <= 1000 && addend1 > 0 && addend2 > 0 && addend3 > 0) {
-            const resultStr = result.toString();
-            const resultDigits = resultStr.split('').map(Number);
-            
-            problems.push({
-              addend1,
-              addend2,
-              addend3,
-              result,
-              resultDigits,
-              numberSet: 3
-            });
-          }
+          problems.push({
+            addend1,
+            addend2,
+            addend3,
+            result,
+            resultDigits,
+            numberSet: 3
+          });
         }
       }
     }
@@ -337,7 +365,7 @@ const AdditionApp = () => {
 
   // Generate print content
   const generatePrintContent = () => {
-    const levelText = level === 'easy' ? 'ง่าย' : level === 'medium' ? 'ปานกลาง' : 'ยาก';
+    const levelText = level === 'easy' ? 'ง่าย' : level === 'medium' ? 'ปานกลาง' : level === 'hard' ? 'ยาก' : 'โอลิมปิก';
     const carryText = carry === 'none' ? 'ไม่มี' : 'มี'; // เปลี่ยนจาก borrowText
     
     return `
@@ -732,6 +760,19 @@ const AdditionApp = () => {
                   }`}
                 >
                   ยาก
+                </button>
+                <button
+                  onClick={() => { 
+                    setLevel('olympic'); 
+                    generateNewSetWithParams(count, 'olympic', digits, carry, numberSet);
+                  }}
+                  className={`w-full px-3 py-2 rounded-lg font-medium transition-all ${
+                    level === 'olympic'
+                      ? 'bg-purple-200 text-purple-800 shadow-sm'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  โอลิมปิก
                 </button>
               </div>
             </div>
