@@ -64,38 +64,35 @@ const AdditionApp = () => {
     const maxAttempts = count * 10; // Prevent infinite loops
     let attempts = 0;
 
-    // Define digit ranges based on level
-    const getDigitRange = (level: string) => {
+    // Define digit sets based on level
+    const getDigitSet = (level: string) => {
       switch(level) {
-        case 'easy': return { min: 1, max: 5 };
-        case 'medium': return { min: 3, max: 7 };
-        case 'hard': return { min: 3, max: 9 };
-        case 'olympic': return { min: 7, max: 9 };
-        default: return { min: 1, max: 9 };
+        case 'easy': return [1, 2, 3, 4, 5];
+        case 'medium': return [3, 4, 5, 6, 7];
+        case 'hard': return [0, 3, 4, 5, 6, 7, 8, 9]; // ยาก: 3,4,5,6,7,8,9,0
+        case 'olympic': return [0, 6, 7, 8, 9]; // โอลิมปิก: 6,7,8,9,0
+        default: return [1, 2, 3, 4, 5, 6, 7, 8, 9];
       }
     };
 
-    const digitRange = getDigitRange(level);
-    console.log('Digit range for level', level, ':', digitRange);
+    const digitSet = getDigitSet(level);
+    console.log('Digit set for level', level, ':', digitSet);
 
     // Helper function to generate a number with specific digit constraints
-    const generateNumberWithDigitRange = (numDigits: number, minDigit: number, maxDigit: number) => {
+    const generateNumberWithDigitSet = (numDigits: number, allowedDigits: number[]) => {
       let result = '';
       for (let i = 0; i < numDigits; i++) {
         if (i === 0) {
-          // First digit cannot be 0, but must be within range
-          const min = Math.max(1, minDigit);
-          const max = maxDigit;
-          if (min <= max) {
-            result += Math.floor(Math.random() * (max - min + 1)) + min;
+          // First digit cannot be 0
+          const nonZeroDigits = allowedDigits.filter(d => d !== 0);
+          if (nonZeroDigits.length > 0) {
+            result += nonZeroDigits[Math.floor(Math.random() * nonZeroDigits.length)];
           } else {
             result += '1'; // fallback
           }
         } else {
-          // Other digits can be 0-9 but within the specified range
-          const min = Math.max(0, minDigit);
-          const max = maxDigit;
-          result += Math.floor(Math.random() * (max - min + 1)) + min;
+          // Other digits can include 0
+          result += allowedDigits[Math.floor(Math.random() * allowedDigits.length)];
         }
       }
       return parseInt(result);
@@ -108,7 +105,7 @@ const AdditionApp = () => {
       
       if (numberSet === 2) {
         // Regular A + B = ? problem  
-        addend1 = generateNumberWithDigitRange(digits, digitRange.min, digitRange.max);
+        addend1 = generateNumberWithDigitSet(digits, digitSet);
         
         if (carry === 'none') {
           // Ensure no carrying by adjusting addend2
@@ -117,20 +114,26 @@ const AdditionApp = () => {
           
           for (let i = 0; i < digits; i++) {
             const digit1 = parseInt(addend1Str[i]);
-            const maxAllowed = Math.min(9 - digit1, digitRange.max);
-            let minAllowed = digitRange.min;
+            const availableDigits = digitSet.filter(d => {
+              const sum = digit1 + d;
+              return sum <= 9; // No carry
+            });
             
             if (i === 0) {
-              minAllowed = Math.max(1, digitRange.min); // First digit cannot be 0
+              // First digit cannot be 0
+              const nonZeroAvailable = availableDigits.filter(d => d !== 0);
+              if (nonZeroAvailable.length > 0) {
+                addend2Digits.push(nonZeroAvailable[Math.floor(Math.random() * nonZeroAvailable.length)]);
+              } else {
+                break; // Skip this problem
+              }
             } else {
-              minAllowed = Math.max(0, digitRange.min); // Other digits can be 0
-            }
-            
-            if (maxAllowed >= minAllowed) {
-              addend2Digits.push(Math.floor(Math.random() * (maxAllowed - minAllowed + 1)) + minAllowed);
-            } else {
-              // Skip this problem if no valid digit can be generated
-              break;
+              // Other digits can be 0
+              if (availableDigits.length > 0) {
+                addend2Digits.push(availableDigits[Math.floor(Math.random() * availableDigits.length)]);
+              } else {
+                break; // Skip this problem
+              }
             }
           }
           
@@ -140,8 +143,8 @@ const AdditionApp = () => {
             continue; // Skip this iteration
           }
         } else {
-          // Allow carrying - generate second addend within digit range
-          addend2 = generateNumberWithDigitRange(digits, digitRange.min, digitRange.max);
+          // Allow carrying - generate second addend with digit set
+          addend2 = generateNumberWithDigitSet(digits, digitSet);
         }
 
         const result = addend1 + addend2;
@@ -161,9 +164,57 @@ const AdditionApp = () => {
         }
       } else {
         // A + B + C = ? problem
-        addend1 = generateNumberWithDigitRange(digits, digitRange.min, digitRange.max);
-        addend2 = generateNumberWithDigitRange(digits, digitRange.min, digitRange.max);
-        addend3 = generateNumberWithDigitRange(digits, digitRange.min, digitRange.max);
+        if (carry === 'none') {
+          // For 3-number problems without carry, we need special logic
+          addend1 = generateNumberWithDigitSet(digits, digitSet);
+          const addend1Str = addend1.toString().padStart(digits, '0');
+          const addend2Digits = [];
+          const addend3Digits = [];
+          
+          let validProblem = true;
+          for (let i = 0; i < digits; i++) {
+            const digit1 = parseInt(addend1Str[i]);
+            
+            // Find valid combinations for digit2 and digit3 where digit1 + digit2 + digit3 <= 9
+            const validCombinations = [];
+            for (const d2 of digitSet) {
+              for (const d3 of digitSet) {
+                const sum = digit1 + d2 + d3;
+                if (sum <= 9) {
+                  // Check first digit constraint
+                  if (i === 0) {
+                    if (d2 !== 0 && d3 !== 0) {
+                      validCombinations.push([d2, d3]);
+                    }
+                  } else {
+                    validCombinations.push([d2, d3]);
+                  }
+                }
+              }
+            }
+            
+            if (validCombinations.length > 0) {
+              const randomCombo = validCombinations[Math.floor(Math.random() * validCombinations.length)];
+              addend2Digits.push(randomCombo[0]);
+              addend3Digits.push(randomCombo[1]);
+            } else {
+              validProblem = false;
+              break;
+            }
+          }
+          
+          if (validProblem && addend2Digits.length === digits && addend3Digits.length === digits) {
+            addend2 = parseInt(addend2Digits.join(''));
+            addend3 = parseInt(addend3Digits.join(''));
+          } else {
+            continue; // Skip this iteration
+          }
+        } else {
+          // Allow carrying - generate all addends with digit set
+          addend1 = generateNumberWithDigitSet(digits, digitSet);
+          addend2 = generateNumberWithDigitSet(digits, digitSet);
+          addend3 = generateNumberWithDigitSet(digits, digitSet);
+        }
         
         const result = addend1 + addend2 + addend3;
         
