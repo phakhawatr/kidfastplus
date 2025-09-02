@@ -146,13 +146,19 @@ const AdditionApp = () => {
     return problems;
   };
 
-  // Initialize new problem set
-  const generateNewSet = () => {
-    const newProblems = generateAdditionProblems(count, level, digits, carry, numberSet);
+  // Initialize new problem set with specific parameters
+  const generateNewSetWithParams = (newCount?: number, newLevel?: string, newDigits?: number, newCarry?: string, newNumberSet?: number) => {
+    const currentCount = newCount ?? count;
+    const currentLevel = newLevel ?? level;
+    const currentDigits = newDigits ?? digits;
+    const currentCarry = newCarry ?? carry;
+    const currentNumberSet = newNumberSet ?? numberSet;
+    
+    const newProblems = generateAdditionProblems(currentCount, currentLevel, currentDigits, currentCarry, currentNumberSet);
     setProblems(newProblems);
-    setAnswers(new Array(count).fill(null).map(() => []));
-    setCarryInputs(new Array(count).fill(null).map(() => [])); // เพิ่มการรีเซ็ต carry inputs
-    setResults(new Array(count).fill('pending'));
+    setAnswers(new Array(currentCount).fill(null).map(() => []));
+    setCarryInputs(new Array(currentCount).fill(null).map(() => []));
+    setResults(new Array(currentCount).fill('pending'));
     setShowAnswers(false);
     setShowResultModal(false);
     setStartedAt(null);
@@ -164,6 +170,11 @@ const AdditionApp = () => {
       inputRefs.current = [];
       carryInputRefs.current = [];
     }, 100);
+  };
+
+  // Initialize new problem set
+  const generateNewSet = () => {
+    generateNewSetWithParams();
   };
 
   // Get answer box count based on mathematical principles
@@ -661,7 +672,10 @@ const AdditionApp = () => {
                 {[10, 15, 20, 30].map((num) => (
                   <button
                     key={num}
-                    onClick={() => { setCount(num); setTimeout(generateNewSet, 50); }}
+                    onClick={() => { 
+                      setCount(num); 
+                      generateNewSetWithParams(num, level, digits, carry, numberSet);
+                    }}
                     className={`w-full px-3 py-2 rounded-lg font-medium transition-all ${
                       count === num
                         ? 'bg-blue-200 text-blue-800 shadow-sm'
@@ -681,7 +695,10 @@ const AdditionApp = () => {
               </label>
               <div className="space-y-2">
                 <button
-                  onClick={() => { setLevel('easy'); setTimeout(generateNewSet, 50); }}
+                  onClick={() => { 
+                    setLevel('easy'); 
+                    generateNewSetWithParams(count, 'easy', digits, carry, numberSet);
+                  }}
                   className={`w-full px-3 py-2 rounded-lg font-medium transition-all ${
                     level === 'easy'
                       ? 'bg-purple-200 text-purple-800 shadow-sm'
@@ -691,7 +708,10 @@ const AdditionApp = () => {
                   ง่าย
                 </button>
                 <button
-                  onClick={() => { setLevel('medium'); setTimeout(generateNewSet, 50); }}
+                  onClick={() => { 
+                    setLevel('medium'); 
+                    generateNewSetWithParams(count, 'medium', digits, carry, numberSet);
+                  }}
                   className={`w-full px-3 py-2 rounded-lg font-medium transition-all ${
                     level === 'medium'
                       ? 'bg-purple-200 text-purple-800 shadow-sm'
@@ -701,7 +721,10 @@ const AdditionApp = () => {
                   ปานกลาง
                 </button>
                 <button
-                  onClick={() => { setLevel('hard'); setTimeout(generateNewSet, 50); }}
+                  onClick={() => { 
+                    setLevel('hard'); 
+                    generateNewSetWithParams(count, 'hard', digits, carry, numberSet);
+                  }}
                   className={`w-full px-3 py-2 rounded-lg font-medium transition-all ${
                     level === 'hard'
                       ? 'bg-purple-200 text-purple-800 shadow-sm'
@@ -722,7 +745,10 @@ const AdditionApp = () => {
                 {[1, 2, 3].map((num) => (
                   <button
                     key={num}
-                    onClick={() => { setDigits(num); setTimeout(generateNewSet, 50); }}
+                    onClick={() => { 
+                      setDigits(num); 
+                      generateNewSetWithParams(count, level, num, carry, numberSet);
+                    }}
                     className={`w-full px-3 py-2 rounded-lg font-medium transition-all ${
                       digits === num
                         ? 'bg-blue-200 text-blue-800 shadow-sm'
@@ -742,7 +768,10 @@ const AdditionApp = () => {
               </label>
               <div className="space-y-2">
                 <button
-                  onClick={() => { setNumberSet(2); setTimeout(generateNewSet, 50); }}
+                  onClick={() => { 
+                    setNumberSet(2); 
+                    generateNewSetWithParams(count, level, digits, carry, 2);
+                  }}
                   className={`w-full px-3 py-2 rounded-lg font-medium transition-all ${
                     numberSet === 2
                       ? 'bg-green-200 text-green-800 shadow-sm'
@@ -752,7 +781,10 @@ const AdditionApp = () => {
                   2 จำนวน
                 </button>
                 <button
-                  onClick={() => { setNumberSet(3); setTimeout(generateNewSet, 50); }}
+                  onClick={() => { 
+                    setNumberSet(3); 
+                    generateNewSetWithParams(count, level, digits, carry, 3);
+                  }}
                   className={`w-full px-3 py-2 rounded-lg font-medium transition-all ${
                     numberSet === 3
                       ? 'bg-green-200 text-green-800 shadow-sm'
@@ -771,7 +803,10 @@ const AdditionApp = () => {
               </label>
               <div className="space-y-2">
                 <button
-                  onClick={() => { setCarry('none'); setTimeout(generateNewSet, 50); }}
+                  onClick={() => { 
+                    setCarry('none'); 
+                    generateNewSetWithParams(count, level, digits, 'none', numberSet);
+                  }}
                   className={`w-full px-3 py-2 rounded-lg font-medium transition-all ${
                     carry === 'none'
                       ? 'bg-red-200 text-red-800 shadow-sm'
@@ -781,7 +816,10 @@ const AdditionApp = () => {
                   ไม่มี
                 </button>
                 <button
-                  onClick={() => { setCarry('with'); setTimeout(generateNewSet, 50); }}
+                  onClick={() => { 
+                    setCarry('with'); 
+                    generateNewSetWithParams(count, level, digits, 'with', numberSet);
+                  }}
                   className={`w-full px-3 py-2 rounded-lg font-medium transition-all ${
                     carry === 'with'
                       ? 'bg-red-200 text-red-800 shadow-sm'
